@@ -1,0 +1,23 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/ast-grep/ast-grep/main/schemas/rule.json
+
+id: avoid-expensive-events
+message: expensive event found
+severity: warning
+language: zeek
+
+rule:
+  kind: event
+  has:
+    kind: id
+    any:
+      - regex: new_packet
+      - regex: raw_packet
+      - regex: http_entity_data
+      - regex: packet_contents
+
+fix: ""
+
+note: |
+  These events can incur substantial overhead on operational Zeek clusters and
+  should never be used. This can be safely ignored if only running offline on
+  PCAPs.

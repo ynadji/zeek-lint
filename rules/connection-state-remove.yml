@@ -1,0 +1,18 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/ast-grep/ast-grep/main/schemas/rule.json
+
+id: connection-state-remove
+message: connection state remove without early return found
+severity: warning
+language: zeek
+
+rule:
+  kind: event
+  has:
+    kind: id
+    regex: connection_state_remove
+
+fix: ""
+
+note: |
+  connection_state_remove occurs at the end of every session, which also means
+  every UDP packet. Without early returns 
