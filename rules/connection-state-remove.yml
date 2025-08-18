@@ -6,13 +6,22 @@ severity: warning
 language: zeek
 
 rule:
-  kind: event
-  has:
-    kind: id
-    regex: connection_state_remove
-
-fix: ""
+  kind: func_decl
+  all:
+    - has:
+        kind: func_hdr
+        has:
+          kind: event
+          regex: connection_state_remove
+    - not:
+        has:
+          regex: "if"
+          stopBy: end
+          has:
+            regex: "return"
 
 note: |
   connection_state_remove occurs at the end of every session, which also means
-  every UDP packet. Without early returns 
+  every UDP packet. Without early returns filtering out a lot of traffic, this
+  can overload a sensor. This can be safely ignored if only running offline on
+  PCAPs.

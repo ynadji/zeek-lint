@@ -15,8 +15,6 @@ rule:
       - regex: http_entity_data
       - regex: packet_contents
 
-fix: ""
-
 note: |
   These events can incur substantial overhead on operational Zeek clusters and
   should never be used. This can be safely ignored if only running offline on
