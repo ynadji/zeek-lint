@@ -1,0 +1,53 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/ast-grep/ast-grep/main/schemas/rule.json
+
+id: prefer-network-time-to-current-time
+message: use network_time() instead of current_time()
+severity: warning
+language: zeek
+
+rule:
+  kind: expr
+  has:
+    kind: id
+    pattern: current_time
+
+fix: "network_time()"
+
+note: |
+  Zeek’s network time is driven by the timestamps of the packets it processes.
+  Instead, current time always refers to the current wall clock. When running on
+  PCAPs, e.g. for testing content, using `network_time()` allows to establish
+  determinism. When running live, using `network_time()` will help to maintain
+  exact results, even if packet processing gets delayed in overload situations.
+
+---
+id: print-is-not-a-function
+message: avoid parenthese around the argument to `print` statement
+severity: warning
+language: zeek
+
+rule:
+  kind: stmt
+  all:
+    - has:
+        pattern: 'print'
+    - has:
+        kind: expr_list
+        pattern: '$ARGS'
+        has:
+          kind: expr
+          has:
+            pattern: '('
+
+transform:
+  NEW_VAR:
+    substring:
+      source: $ARGS
+      startChar: 1
+      endChar: -1
+
+fix: "print $NEW_VAR;"
+
+note: |
+  `print` is not a function call. It’s helpful for `print` statements to stand
+  out visually as generally they’re only used for debugging.
