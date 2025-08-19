@@ -51,3 +51,30 @@ fix: "print $NEW_VAR;"
 note: |
   `print` is not a function call. It’s helpful for `print` statements to stand
   out visually as generally they’re only used for debugging.
+
+---
+id: omit-unnecessary-initializations
+message: foo bar
+severity: warning
+language: zeek
+
+rule:
+  kind: initializer
+  has:
+    kind: expr
+    any:
+      - pattern: 'set()'
+      - pattern: 'vector()'
+      - pattern: 'table()'
+
+# This sadly leaves a space hanging around between the type and the ; at the end
+# of the statement, due to how the parse tree is constructed. It's possible this
+# could be fixed with the `expandStart` parameter, but I wasn't able to get it
+# to work. See https://ast-grep.github.io/reference/yaml/fix.html
+fix: ""
+
+note: |
+  Zeek automatically initializes tables, sets and vectors to empty containers.
+  Adding an explicit initializer leads the reader to expect that the variable
+  starts off non-empty, until they scan the initializer and see that that’s not
+  the case.
