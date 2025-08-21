@@ -39,6 +39,7 @@ rule:
           has:
             pattern: '('
 
+# Hack to trim the () surrounding $ARGS.
 transform:
   NEW_VAR:
     substring:
@@ -54,7 +55,7 @@ note: |
 
 ---
 id: omit-unnecessary-initializations
-message: foo bar
+message: container types are automatically initialized as empty
 severity: warning
 language: zeek
 
@@ -78,3 +79,31 @@ note: |
   Adding an explicit initializer leads the reader to expect that the variable
   starts off non-empty, until they scan the initializer and see that that’s not
   the case.
+
+---
+id: default-attribute-overrides-optional
+message: default attribute overrides (unnecessary) optional attribute
+severity: warning
+language: zeek
+
+rule:
+  kind: attr_list
+  pattern: $ATTRS
+  all:
+    - has:
+        kind: attr
+        has:
+          pattern: '&optional'
+    - has:
+        kind: attr
+        has:
+          pattern: '&default'
+
+transform:
+  WITHOUT_OPTIONAL:
+    replace:
+      replace: ' &optional'
+      by: ''
+      source: $ATTRS
+
+fix: $WITHOUT_OPTIONAL
